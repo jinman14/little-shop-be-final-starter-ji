@@ -19,6 +19,7 @@ class Api::V1::CouponsController < ApplicationController
 
   def update
     coupon = Coupon.find(params[:id])
+    coupon.update!(coupon_params)
 
     render json: CouponSerializer.new(coupon)
   end
