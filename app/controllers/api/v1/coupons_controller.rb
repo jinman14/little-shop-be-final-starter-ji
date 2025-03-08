@@ -27,6 +27,6 @@ class Api::V1::CouponsController < ApplicationController
   private
 
   def coupon_params
-    params.permit(:name, :code, :discount, :merchant_id)
+    params.permit(:name, :code, :discount, :merchant_id, :status)
   end
 end

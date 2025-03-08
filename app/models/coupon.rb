@@ -3,6 +3,6 @@ class Coupon < ApplicationRecord
   validates :code, presence: true
   validates :discount, presence: true
   belongs_to :merchant
-  has_many :invoices, optional: true
+  has_many :invoices
 
 end
