@@ -30,3 +30,6 @@ Rails.application.routes.draw do
     end
   end
 end
+
+# PATCH localhost:3000/api/v1/merchants/1/coupons/1
+# PATCH localhost:3000/api/v1/merchants/1/coupons/1?active=false
