@@ -1,25 +1,20 @@
 class Api::V1::Merchants::CouponsController < ApplicationController
-  # before_action :set_merchant
+  before_action :set_merchant
 
   def index
-    merchant = Merchant.find(params[:merchant_id])
-    puts "Merchant ID: #{merchant.id}"
-    coupons = merchant.coupons
-    puts "Coupons: #{coupons.inspect}"
+    coupons = @merchant.coupons
 
     render json: CouponSerializer.new(coupons)
   end
 
   def show
-    merchant = Merchant.find(params[:merchant_id])
-    coupon = merchant.coupons.find(params[:id])
+    coupon = @merchant.coupons.find(params[:id])
 
     render json: CouponSerializer.new(coupon)
   end
 
   def create
-    merchant = Merchant.find(params[:merchant_id])
-    coupon = merchant.coupons.build(coupon_params)
+    coupon = @merchant.coupons.build(coupon_params)
 
     if coupon.status == 'active' && @merchant.coupons.active.count >= 5
       render json: { errors: ["This merchant already has 5 active coupons. Deactivate an old coupon to add a new one."] }, status: :unprocessable_entity
@@ -33,8 +28,7 @@ class Api::V1::Merchants::CouponsController < ApplicationController
   end
 
   def update
-    merchant = Merchant.find(params[:merchant_id])
-    coupon = merchant.coupons.find(params[:id])
+    coupon = @merchant.coupons.find(params[:id])
 
     if coupon.status == 'active' && @merchant.coupons.active.count >= 5
       render json: { errors: ["This merchant already has 5 active coupons. Deactivate an old coupon to activate a different one."] }
