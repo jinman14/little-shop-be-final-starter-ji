@@ -10,7 +10,7 @@ class Api::V1::Merchants::CouponsController < ApplicationController
   def show
     coupon = @merchant.coupons.find(params[:id])
 
-    render json: CouponSerializer.new(coupon)
+    render json: CouponSerializer.new(coupon, params: { action: 'show' })
   end
 
   def create

@@ -9,6 +9,10 @@ class Coupon < ApplicationRecord
   validates :discount, presence: true
   validate :active_coupon_limit, if: :status_active?
 
+  def usage_count
+    invoices.where(coupon_id: self.id).count
+  end
+
   private
 
   def active_coupon_limit
