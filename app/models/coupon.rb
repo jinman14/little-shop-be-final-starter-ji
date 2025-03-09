@@ -7,11 +7,11 @@ class Coupon < ApplicationRecord
   validates :name, presence: true
   validates :code, presence: true, uniqueness: true
   validates :discount, presence: true
-  validate :merchant_active_coupon_limit, if: :status_active?
+  validate :active_coupon_limit, if: :status_active?
 
   private
 
-  def merchant_active_coupon_limit
+  def active_coupon_limit
     if merchant.coupons.active.count >= 5
       errors.add(:status, "Merchant already has 5 active coupons")
     end
