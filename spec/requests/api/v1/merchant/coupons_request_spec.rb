@@ -21,6 +21,7 @@ RSpec.describe "Merchant coupon endpoints" do
     @invoice4 = Invoice.create!(customer: @customer1, merchant: @merchant1, status: "shipped", coupon_id: @coupon3.id)
     @invoice5 = Invoice.create!(customer: @customer1, merchant: @merchant2, status: "shipped", coupon_id: @coupon4.id)
   end
+  
   describe "GET Index" do
     it "should return all coupons associated with a given merchant" do
       get "/api/v1/merchants/#{@merchant1.id}/coupons"
