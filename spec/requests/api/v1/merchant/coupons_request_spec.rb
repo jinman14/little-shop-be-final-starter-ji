@@ -12,6 +12,8 @@ RSpec.describe "Merchant coupon endpoints" do
     @coupon2 = Coupon.create!(name: "Coop Coop", code: "cod3", discount: 25.00, merchant: @merchant1, status: 'inactive')
     @coupon3 = Coupon.create!(name: "Cooooop", code: "whoaThree", discount: 50.00, merchant: @merchant1, status: 'active')
     @coupon4 = Coupon.create!(name: "Four?", code: "areyakiddin", discount: 75.00, merchant: @merchant2, status: 'active')
+    @coupon5 = Coupon.create!(name: "anotha one", code: "thirty", discount: 30.00, merchant: @merchant1, status: 'active')
+    @coupon6 = Coupon.create!(name: "Last one", code: "g01ng2break", discount: 20.0, merchant: @merchant1, status: 'active')
 
     @invoice1 = Invoice.create!(customer: @customer1, merchant: @merchant1, status: "packaged", coupon_id: @coupon1.id)
     @invoice2 = Invoice.create!(customer: @customer1, merchant: @merchant1, status: "shipped", coupon_id: @coupon1.id)
@@ -26,7 +28,7 @@ RSpec.describe "Merchant coupon endpoints" do
       json = JSON.parse(response.body, symbolize_names: true)
 
       expect(response).to be_successful
-      expect(json[:data].count).to eq(3)
+      expect(json[:data].count).to eq(5)
       expect(json[:data][0][:id]).to eq(@coupon1.id.to_s)
       expect(json[:data][0][:type]).to eq("coupon")
       expect(json[:data][0][:attributes][:name]).to eq("Coo-pin Time")
@@ -70,6 +72,29 @@ RSpec.describe "Merchant coupon endpoints" do
       expect(json[:data][:attributes][:code]).to eq(code)
       expect(json[:data][:attributes][:discount]).to eq(discount)
       expect(json[:data][:attributes][:status]).to eq(status)
+    end
+
+    it "won't create a new active coupon if a merchant already has 5 active" do
+      coupon7 = Coupon.create!(name: "For real", code: "rightNAO", discount: 1.0, merchant: @merchant1, status: 'active')
+      
+      name = "New Coo"
+      code = "S0 N3w"
+      discount = "100.0"
+      status = "active"
+      newcoupon = {
+        coupon: {
+          name: name,
+          code: code,
+          discount: discount,
+          status: status
+        }
+      }
+
+      post "/api/v1/merchants/#{@merchant1.id}/coupons", params: newcoupon, as: :json
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response.status).to eq(422)
+      expect(json[:errors]).to eq(["This merchant already has 5 active coupons. Deactivate an old coupon to add a new one."])
     end
   end
 end
