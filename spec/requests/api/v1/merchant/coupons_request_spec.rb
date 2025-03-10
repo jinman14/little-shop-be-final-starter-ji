@@ -19,31 +19,57 @@ RSpec.describe "Merchant coupon endpoints" do
     @invoice4 = Invoice.create!(customer: @customer1, merchant: @merchant1, status: "shipped", coupon_id: @coupon3.id)
     @invoice5 = Invoice.create!(customer: @customer1, merchant: @merchant2, status: "shipped", coupon_id: @coupon4.id)
   end
+  describe "GET Index" do
+    it "should return all coupons associated with a given merchant" do
+      get "/api/v1/merchants/#{@merchant1.id}/coupons"
 
-  it "should return all coupons associated with a given merchant" do
-    get "/api/v1/merchants/#{@merchant1.id}/coupons"
+      json = JSON.parse(response.body, symbolize_names: true)
 
-    json = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to be_successful
+      expect(json[:data].count).to eq(3)
+      expect(json[:data][0][:id]).to eq(@coupon1.id.to_s)
+      expect(json[:data][0][:type]).to eq("coupon")
+      expect(json[:data][0][:attributes][:name]).to eq("Coo-pin Time")
+      expect(json[:data][0][:attributes][:code]).to eq("c0de")
+      expect(json[:data][0][:attributes][:status]).to eq("active")
+    end
+  end
+  describe "GET Show" do
+    it "should return a single coupon related to a merchant" do
+      get "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon1.id}"
 
-    expect(response).to be_successful
-    expect(json[:data].count).to eq(3)
-    expect(json[:data][0][:id]).to eq(@coupon1.id.to_s)
-    expect(json[:data][0][:type]).to eq("coupon")
-    expect(json[:data][0][:attributes][:name]).to eq("Coo-pin Time")
-    expect(json[:data][0][:attributes][:code]).to eq("c0de")
-    expect(json[:data][0][:attributes][:status]).to eq("active")
+      json = JSON.parse(response.body, symbolize_names: true)
+      
+      expect(response).to be_successful
+      expect(json[:data]).to be_a(Hash)
+      expect(json[:data][:id]).to eq(@coupon1.id.to_s)
+      expect(json[:data][:attributes][:name]).to eq(@coupon1.name.to_s)
+      expect(json[:data][:attributes][:discount]).to eq("10.0")
+      expect(json[:data][:attributes][:usage_count]).to eq(2)
+    end
   end
 
-  it "should return a single coupon related to a merchant" do
-    get "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon1.id}"
+  describe "Create Coupon" do
+    it "can create a coupon associated with a merchant" do
+      name = "New Coo"
+      code = "S0 N3w"
+      discount = "100.0"
+      status = "inactive"
+      newcoupon = {
+        coupon: {
+          name: name,
+          code: code,
+          discount: discount,
+          status: status
+        }
+      }
+      post "/api/v1/merchants/#{@merchant1.id}/coupons", params: newcoupon, as: :json
+      json = JSON.parse(response.body, symbolize_names: true)
 
-    json = JSON.parse(response.body, symbolize_names: true)
-    
-    expect(response).to be_successful
-    expect(json[:data]).to be_a(Hash)
-    expect(json[:data][:id]).to eq(@coupon1.id.to_s)
-    expect(json[:data][:attributes][:name]).to eq(@coupon1.name.to_s)
-    expect(json[:data][:attributes][:discount]).to eq("10.0")
-    expect(json[:data][:attributes][:usage_count]).to eq(2)
+      expect(json[:data][:attributes][:name]).to eq(name)
+      expect(json[:data][:attributes][:code]).to eq(code)
+      expect(json[:data][:attributes][:discount]).to eq(discount)
+      expect(json[:data][:attributes][:status]).to eq(status)
+    end
   end
 end
