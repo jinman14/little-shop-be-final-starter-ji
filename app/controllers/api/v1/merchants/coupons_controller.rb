@@ -2,14 +2,20 @@ class Api::V1::Merchants::CouponsController < ApplicationController
   before_action :set_merchant
 
   def index
-    coupons = @merchant.coupons
-
+    # coupons = @merchant.coupons
+    
+    # if params[:status]
+    #   activity = params[:status]
+    #   coupons = @merchant.coupons.coupon_activity_by_merchant(@merchant, activity)
+    # end
+    coupons = Coupon.coupon_activity_by_merchant(@merchant, params[:status])
+    
     render json: CouponSerializer.new(coupons)
   end
 
   def show
     coupon = @merchant.coupons.find(params[:id])
-Rails.logger.debug("Params: #{params.inspect}")
+
     render json: CouponSerializer.new(coupon, params: { action: 'show' })
   end
 

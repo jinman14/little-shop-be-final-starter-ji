@@ -13,6 +13,14 @@ class Coupon < ApplicationRecord
     invoices.where(coupon_id: self.id).count
   end
 
+  def self.coupon_activity_by_merchant(merchant, activity = nil)
+    if activity.present?
+      where(merchant: merchant, status: activity)
+    else
+      where(merchant: merchant)
+    end
+  end
+
   private
 
   def active_coupon_limit
