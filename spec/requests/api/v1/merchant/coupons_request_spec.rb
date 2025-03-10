@@ -76,7 +76,7 @@ RSpec.describe "Merchant coupon endpoints" do
 
     it "won't create a new active coupon if a merchant already has 5 active" do
       coupon7 = Coupon.create!(name: "For real", code: "rightNAO", discount: 1.0, merchant: @merchant1, status: 'active')
-      
+
       name = "New Coo"
       code = "S0 N3w"
       discount = "100.0"
@@ -95,6 +95,37 @@ RSpec.describe "Merchant coupon endpoints" do
 
       expect(response.status).to eq(422)
       expect(json[:errors]).to eq(["This merchant already has 5 active coupons. Deactivate an old coupon to add a new one."])
+    end
+  end
+
+  describe "Update Coupons" do
+    it "can update attributes" do
+      updates = {
+        name: "NEW NAME",
+        status: "inactive"
+      }
+
+      patch "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon1.id}", params: updates, as: :json
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      expect(json[:data][:id]).to eq(@coupon1.id.to_s)
+      expect(json[:data][:attributes][:name]).to eq("NEW NAME")
+      expect(json[:data][:attributes][:status]).to eq("inactive")
+    end
+
+    it "won't update the status to active if there are already 5 active coupons" do
+      coupon7 = Coupon.create!(name: "For real", code: "rightNAO", discount: 1.0, merchant: @merchant1, status: 'active')
+
+      updates = {
+        name: "NEW NAME",
+        status: "active"
+      }
+
+      patch "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon2.id}", params: updates, as: :json
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response.status).to eq(422)
+      expect(json[:errors]).to eq(["Status Merchant already has 5 active coupons"])
     end
   end
 end
