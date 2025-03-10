@@ -33,4 +33,17 @@ RSpec.describe "Merchant coupon endpoints" do
     expect(json[:data][0][:attributes][:code]).to eq("c0de")
     expect(json[:data][0][:attributes][:status]).to eq("active")
   end
+
+  it "should return a single coupon related to a merchant" do
+    get "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon1.id}"
+
+    json = JSON.parse(response.body, symbolize_names: true)
+    
+    expect(response).to be_successful
+    expect(json[:data]).to be_a(Hash)
+    expect(json[:data][:id]).to eq(@coupon1.id.to_s)
+    expect(json[:data][:attributes][:name]).to eq(@coupon1.name.to_s)
+    expect(json[:data][:attributes][:discount]).to eq("10.0")
+    expect(json[:data][:attributes][:usage_count]).to eq(2)
+  end
 end
