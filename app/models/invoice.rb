@@ -6,5 +6,4 @@ class Invoice < ApplicationRecord
   has_many :transactions, dependent: :destroy
 
   validates :status, inclusion: { in: ["shipped", "packaged", "returned"] }
-  validates :coupon_id, uniqueness: true, allow_nil: true
 end
