@@ -92,5 +92,29 @@ describe Merchant, type: :model do
       expect(merchant.invoices_filtered_by_status("returned")).to eq([inv_5_returned])
       expect(other_merchant.invoices_filtered_by_status("packaged")).to eq([inv_4_packaged])
     end
+
+    it "#coupon_count" do
+    merchant = Merchant.create!(name: "My merchant")
+    merchant2 = Merchant.create!(name: "My other merchant")
+
+    create_list(:coupon, 3, merchant_id: merchant.id)
+    create_list(:coupon, 2, merchant_id: merchant2.id)
+
+    expect(merchant.coupon_count).to eq(3)
+    expect(merchant2.coupon_count).to eq(2)
+    end
+
+    it "#invoice_coupon_count" do
+    merchant = Merchant.create!(name: "My merchant")
+    customer = create(:customer)
+    coupon = create(:coupon, merchant_id: merchant.id)
+    create(:invoice, status: "returned", merchant_id: merchant.id, customer_id: customer.id, coupon_id: coupon.id )
+
+    expect(merchant.invoice_coupon_count).to eq(1)
+
+    create(:invoice, status: "returned", merchant_id: merchant.id, customer_id: customer.id, coupon_id: coupon.id )
+
+    expect(merchant.invoice_coupon_count).to eq(2)
+    end
   end
 end
