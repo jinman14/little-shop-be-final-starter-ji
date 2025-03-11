@@ -103,5 +103,18 @@ describe Merchant, type: :model do
     expect(merchant.coupon_count).to eq(3)
     expect(merchant2.coupon_count).to eq(2)
     end
+
+    it "#invoice_coupon_count" do
+    merchant = Merchant.create!(name: "My merchant")
+    customer = create(:customer)
+    coupon = create(:coupon, merchant_id: merchant.id)
+    create(:invoice, status: "returned", merchant_id: merchant.id, customer_id: customer.id, coupon_id: coupon.id )
+
+    expect(merchant.invoice_coupon_count).to eq(1)
+
+    create(:invoice, status: "returned", merchant_id: merchant.id, customer_id: customer.id, coupon_id: coupon.id )
+
+    expect(merchant.invoice_coupon_count).to eq(2)
+    end
   end
 end
