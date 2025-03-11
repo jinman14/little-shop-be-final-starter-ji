@@ -128,5 +128,23 @@ RSpec.describe "Merchant coupon endpoints" do
       expect(response.status).to eq(422)
       expect(json[:errors]).to eq(["Status Merchant already has 5 active coupons"])
     end
+
+    it "can activate with ?activate=true" do
+      coupon7 = Coupon.create!(name: "For real", code: "rightNAO", discount: 1.0, merchant: @merchant1, status: 'inactive')
+
+      patch "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon2.id}?activate=true"
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      expect(json[:data][:attributes][:status]).to eq("active")
+    end
+
+    it "can deactivate with ?deactivate=true" do
+      coupon7 = Coupon.create!(name: "For real", code: "rightNAO", discount: 1.0, merchant: @merchant1, status: 'active')
+
+      patch "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon2.id}?deactivate=true"
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      expect(json[:data][:attributes][:status]).to eq("inactive")
+    end
   end
 end
