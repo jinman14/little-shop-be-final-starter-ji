@@ -95,7 +95,7 @@ RSpec.describe "Merchant coupon endpoints" do
       json = JSON.parse(response.body, symbolize_names: true)
 
       expect(response.status).to eq(422)
-      expect(json[:errors]).to eq(["This merchant already has 5 active coupons. Deactivate an old coupon to add a new one."])
+      expect(json[:errors]).to eq(["Status Merchant already has 5 active coupons"])
     end
   end
 

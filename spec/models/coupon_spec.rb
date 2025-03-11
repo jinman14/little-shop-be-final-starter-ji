@@ -51,6 +51,10 @@ describe Coupon, type: :model do
     expect(duplicate_coupon.errors[:code]).to include('has already been taken')
   end
 
+  it 'can count its usage based on invoices it appears in' do
+    expect(@coupon1.usage_count).to eq(2)
+  end
+
   describe 'activity checker' do
     it 'can sort by active' do
       status = 'active'
@@ -65,4 +69,7 @@ describe Coupon, type: :model do
     end
   end
 
+  it 'functions with no activity and will just return a list of coupons' do
+      expect(Coupon.coupon_activity_by_merchant(@merchant1)).to eq([@coupon1, @coupon2, @coupon3, @coupon5, @coupon6])
+  end
 end
