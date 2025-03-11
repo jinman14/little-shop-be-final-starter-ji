@@ -39,11 +39,22 @@ class Api::V1::Merchants::CouponsController < ApplicationController
     # if coupon.status == 'active' && @merchant.coupons.active.count >= 5
     #   render json: { errors: ["This merchant already has 5 active coupons. Deactivate an old coupon to activate a different one."] }
     # else
-      if coupon.update(coupon_params)
+
+    if params[:activate]
+      coupon.status = 'active'
+      render json: CouponSerializer.new(coupon)
+      return
+    elsif params[:deactivate]
+      coupon.status = 'inactive'
+      render json: CouponSerializer.new(coupon)
+      return
+    end
+    
+    if coupon.update(coupon_params)
         render json: CouponSerializer.new(coupon)
-      else
+    else
         render json: { errors: coupon.errors.full_messages }, status: :unprocessable_entity
-      end
+    end
     # end
   end
 
