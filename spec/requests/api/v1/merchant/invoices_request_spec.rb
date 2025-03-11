@@ -8,6 +8,8 @@ RSpec.describe "Merchant invoices endpoints" do
     @customer1 = Customer.create!(first_name: "Papa", last_name: "Gino")
     @customer2 = Customer.create!(first_name: "Jimmy", last_name: "John")
 
+    @coupon1 = Coupon.create!(name: "Coo-pin Time", code: "c0de", discount: 10.00, merchant: @merchant1, status: 'active')
+
     @invoice1 = Invoice.create!(customer: @customer1, merchant: @merchant1, status: "packaged")
     @invoice2 = Invoice.create!(customer: @customer1, merchant: @merchant1, status: "shipped")
     @invoice3 = Invoice.create!(customer: @customer1, merchant: @merchant1, status: "shipped")
@@ -67,5 +69,18 @@ RSpec.describe "Merchant invoices endpoints" do
     expect(response).to be_successful
     expect(json[:data].count).to eq(4)
     expect(json[:data].map { |invoice| invoice[:id] }).to match_array([@invoice1.id.to_s, @invoice2.id.to_s, @invoice3.id.to_s, @invoice4.id.to_s])
+  end
+
+  it 'should be able to update an invoice, mainly to add a coupon' do
+    updates = {
+      coupon_id: @coupon1.id.to_s
+    }
+
+    patch "/api/v1/merchants/#{@merchant1.id}/invoices/#{@invoice2.id}", params: updates, as: :json
+    json = JSON.parse(response.body, symbolize_names: true)
+
+    expect(json[:data][:id]).to eq(@invoice2.id.to_s)
+    expect(json[:data][:attributes][:customer_id]).to eq(@customer1.id)
+    expect(json[:data][:attributes][:coupon_id]).to eq(@coupon1.id)
   end
 end
